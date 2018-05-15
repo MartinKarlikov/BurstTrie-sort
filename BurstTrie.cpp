@@ -1,20 +1,20 @@
-#include "Trie.h"
+#include "BurstTrie.h"
 
-Trie::Trie()
+BurstTrie::BurstTrie()
 {
 	root = new TrieNode;
 
 	count = 0;
 }
 
-Trie::~Trie()
+BurstTrie::~BurstTrie()
 {
 
 	delete root;
 
 }
 
-void Trie::add(string toAdd)
+void BurstTrie::add(string toAdd)
 {
 	++count;
 
@@ -126,31 +126,86 @@ void Trie::add(string toAdd)
 	}
 
 }
-size_t Trie::wordCount() const
+bool BurstTrie::contains(string contained)
+{
+	char letter = parseChar(contained[0]);
+	TNElement* current = &(root->container[letter]);
+
+	while (contained.size()>0)
+	{
+
+		if (!current)
+		{
+			return false;
+		}
+
+		contained.erase(0, 1);
+		if (contained.size()>0)
+		{
+			letter = parseChar(contained[0]);
+		}
+
+		if (current->isBucket)
+		{
+
+			Bucket* tempBucket = reinterpret_cast<Bucket*>(current->next);
+
+			for (vector<string>::iterator it = tempBucket->bucket.begin(); it != tempBucket->bucket.end(); ++it)
+			{
+
+				if (contained == *it)
+				{
+					return true;
+				}
+
+			}
+
+			return false;
+	
+		}
+
+		else
+		{
+			TrieNode* tempNode = reinterpret_cast<TrieNode*>(current->next);
+
+			if (contained.size()==0)
+			{
+				return tempNode->count;
+			}
+
+			current = &(tempNode->container[letter]);
+
+		}
+
+
+
+	}
+}
+size_t BurstTrie::wordCount() const
 {
 	return count;
 }
 
 
-void Trie::fillStack(TrieNode * current, stack<TNElement>& stack) const
+void BurstTrie::fillStack(TrieNode * current, stack<TNElement*>& stack) const
 {
-	TNElement temp;
+	TNElement* temp;
 
 	for (int i = 52; i >= 0; --i)
 	{
 
-		temp = current->container[i];
+		temp = &(current->container[i]);
 
-		if (temp.next != nullptr || temp.index == 52)
+		if (temp->next != nullptr || temp->index == 52)
 		{
 
-			stack.push(current->container[i]);
+			stack.push(temp);
 		}
 
 	}
 }
 
-Trie::TrieNode::TrieNode()
+BurstTrie::TrieNode::TrieNode()
 {
 	container = new TNElement[ALPHABET_SIZE];
 
@@ -168,25 +223,25 @@ Trie::TrieNode::TrieNode()
 	}
 }
 
-Trie::TrieNode::~TrieNode()
+BurstTrie::TrieNode::~TrieNode()
 {
 
 	delete[] container;
 
 }
 
-void Trie::Bucket::addString(string str)
+void BurstTrie::Bucket::addString(string str)
 {
 	bucket.push_back(str);
 }
 
-void Trie::Bucket::sort()
+void BurstTrie::Bucket::sort()
 {
 	std::sort(bucket.begin(), bucket.end());
 
 }
 
-Trie::TrieNode* Trie::Bucket::burst()
+BurstTrie::TrieNode* BurstTrie::Bucket::burst()
 {
 	TrieNode* temp = new TrieNode;
 	vector<string>::iterator it;
@@ -224,7 +279,7 @@ Trie::TrieNode* Trie::Bucket::burst()
 	return temp;
 }
 
-Trie::TNElement::~TNElement()
+BurstTrie::TNElement::~TNElement()
 {
 	if (isBucket)
 	{

@@ -4,18 +4,20 @@
 #include "helperFunctions.h"
 
 #define ALPHABET_SIZE 53
-#define BURST_SIZE 128
+#define BURST_SIZE 2
 
-class Trie
+class BurstTrie
 {
 
 public:
 
-	Trie();
+	BurstTrie();
 
-	~Trie();
+	~BurstTrie();
 
 	void add(string);
+
+	bool contains(string);
 
 	size_t wordCount()const;
 
@@ -64,7 +66,7 @@ private:
 	};
 
 
-	void fillStack(TrieNode*, stack<TNElement>&) const;
+	void fillStack(TrieNode*, stack<TNElement*>&) const;
 
 	size_t count;
 
@@ -73,11 +75,11 @@ private:
 };
 
 template<typename T>
-inline T Trie::sortedConvert() const
+inline T BurstTrie::sortedConvert() const
 {
-	TNElement current;
+	TNElement* current;
 
-	stack<TNElement> dfsStack;
+	stack<TNElement*> dfsStack;
 
 	T container;
 
@@ -91,7 +93,7 @@ inline T Trie::sortedConvert() const
 
 		dfsStack.pop();
 
-		if (current.index == 52)
+		if (current->index == 52)
 		{
 
 			if (cString.size() > 0)
@@ -102,12 +104,12 @@ inline T Trie::sortedConvert() const
 		}
 
 		
-		cString.append(1, parseIndex(current.index));
+		cString.append(1, parseIndex(current->index));
 
-		if (current.isBucket)
+		if (current->isBucket)
 		{
 
-			Bucket* tempBucket = reinterpret_cast<Bucket*>(current.next);
+			Bucket* tempBucket = reinterpret_cast<Bucket*>(current->next);
 
 			tempBucket->sort();
 
@@ -122,7 +124,7 @@ inline T Trie::sortedConvert() const
 
 		else
 		{
-			TrieNode* temp = reinterpret_cast<TrieNode*>(current.next);
+			TrieNode* temp = reinterpret_cast<TrieNode*>(current->next);
 
 			for (size_t i = 0; i < temp->count; ++i)
 			{

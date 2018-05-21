@@ -126,7 +126,7 @@ void BurstTrie::add(string toAdd)
 	}
 
 }
-bool BurstTrie::contains(string contained)
+bool BurstTrie::contains(string contained) const
 {
 	char letter = parseChar(contained[0]);
 	TNElement* current = &(root->container[letter]);

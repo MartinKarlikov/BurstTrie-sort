@@ -8,4 +8,3 @@ and compare the sorting speed**
 For now smaller buckets = faster algorithm, but more space is used up.
 
 **TODO: add a size functions**
-**TODO: add comments explaining the code**
